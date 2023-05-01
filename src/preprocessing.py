@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import re
 import string
-from scipy.sparse import *
 import json
 
 def load_from_file(path_to_data:str):
