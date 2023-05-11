@@ -30,7 +30,7 @@ def do_ner():
     #                 Возможно, вам покажется, что какие-то мысли уже устарели. \
     #                 Но вы должны обязательно подумать и обосновать, почему вы так считаете. \
     #                 А еще вы узнаете и почувствуете, как прекрасно звучат слова любви, сострадания, мудрости и доброты на русском языке.']
-    corpus_after_lm = [lang_model(doc) for doc in preprocessed_corpus]
+    corpus_after_lm = [lang_model(doc) for doc in preprocessed_corpus[0:100]]
     named_entities = {doc : [] for doc in corpus_after_lm}
     for text in tqdm(corpus_after_lm):
         for named_entity in text.ents:
@@ -59,7 +59,7 @@ def do_pos():
     #                 Возможно, вам покажется, что какие-то мысли уже устарели. \
     #                 Но вы должны обязательно подумать и обосновать, почему вы так считаете. \
     #                 А еще вы узнаете и почувствуете, как прекрасно звучат слова любви, сострадания, мудрости и доброты на русском языке.']
-    corpus_after_lm = [lang_model(doc) for doc in preprocessed_corpus]
+    corpus_after_lm = [lang_model(doc) for doc in preprocessed_corpus[0:100]]
     pos = {doc : [] for doc in corpus_after_lm}
     for text in tqdm(corpus_after_lm):
         for token in text:
