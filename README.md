@@ -3,7 +3,8 @@ This repository stands for Bachelor degree work on topic "Knowledge graph extrac
 
 # Content
 ## [data](data)
-- [placeholder](data/placeholder)
+- [data.json](data/result.json)
 ## [report.ipynb](report.ipynb)
 ## [src](src)
-- [ner.py](src/ner.py)
+- [triples_extraction.py](src/triples_extraction.py)
+- [preprocessing.py](src/preprocessing.py)
