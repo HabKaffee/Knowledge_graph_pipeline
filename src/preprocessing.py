@@ -3,6 +3,7 @@ import string
 import json
 import pandas as pd
 import numpy as np
+import tqdm
 
 
 def load_from_file(path_to_data:str):
@@ -12,39 +13,99 @@ def load_from_file(path_to_data:str):
         df = pd.DataFrame(file.get('catalog'))
     return df
 
+
 def preprocess_data(corpus):
+    progress_bar = tqdm.tqdm(range(15), desc="Preprocess data")
+    
     ad_at_end = r'Подписывайтесь на наши страницы в соцсетях: .*.'
     exclude_symbols = ''.join(['№', '«', 'ђ', '°', '±', '‚', 'ћ', '‰', '…', '»', 'ѓ', 'µ', '·', 'ґ', 'њ', 'ї', 'џ', 'є', '‹',
                             '‡', '†', '¶', 'ќ', '€', '“', 'ў', '§', '„', '”', '\ufeff', '’', 'љ', '›', '•', '—', '‘', 
                             '\x7f', '\xad', '¤', '\xa0', '\u200b', '–'])
-    # regex_digit = re.compile('[%s]' % re.escape(string.digits))
     regex_symb = re.compile('[%s]' % re.escape(exclude_symbols))
     regex_struct = re.compile('[%s]' % string.printable + string.whitespace)
-    spaces_punct = {ord(el) : f" {el} " for el in string.punctuation}
+    
     corpus = [re.sub(r'<p.*>.*<\/p>', '', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
     corpus = [re.sub(ad_at_end, "", doc).strip() for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
+    corpus = [re.sub(r'(\d+)([a-zA-Z]+)', r'\1 \2', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
+    corpus = [re.sub(r'([a-zA-Z]+)(\d+)', r'\1 \2', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
     
+
     corpus = [re.sub(r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', doc) for doc in corpus]
-    corpus = np.asarray([doc.strip().strip('\t').replace('\n', '') for doc in corpus])
-    corpus = [re.sub(r' +', ' ', doc) for doc in corpus]
-    corpus = [doc.translate(spaces_punct) for doc in corpus]
-    # corpus = [regex_digit.sub('', doc) for doc in corpus]
-    corpus = [regex_symb.sub(' ', doc) for doc in corpus]
-    corpus = [regex_struct.sub('', doc) for doc in corpus]
-    corpus = [re.sub(' +', ' ', doc.strip()) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
     
+    corpus = np.asarray([doc.strip().strip('\t').replace('\n', '') for doc in corpus])
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub(r'[гГ]\.', 'год(а)', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub(r' +', ' ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    spaces_punct = {ord(el) : f" {el} " for el in string.punctuation}
+    corpus = [doc.translate(spaces_punct) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub('Ltd . ','Ltd. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub('LLC . ','LLC. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub('Co . ','Co. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
+    corpus = [regex_symb.sub(' ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [regex_struct.sub('', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub(' +', ' ', doc.strip()) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    progress_bar.close()
     sentenses_in_corpus = []
-    # with open("test.txt", 'w') as f:
-    #     f.write(' '.join(el for el in corpus))
-    for text in corpus:
-        sentenses_in_corpus.extend(text.split('. '))
+    
+    with tqdm.tqdm(corpus, desc="Split to sentences") as progress_bar_split:
+        for text in corpus:
+            sentenses_in_corpus.extend(text.split(' . '))
+            progress_bar_split.update()
+            progress_bar_split.refresh()
+        progress_bar_split.close()
+    
+    sentenses_in_corpus = [re.sub('Ltd. ','Ltd . ', sentence) for sentence in sentenses_in_corpus]
+    sentenses_in_corpus = [re.sub('LLC. ','LLC . ', sentence) for sentence in sentenses_in_corpus]
+    sentenses_in_corpus = [re.sub('Co. ','Co . ', sentence) for sentence in sentenses_in_corpus]
+        
     return corpus, sentenses_in_corpus
 
 
 
 def load_preprocessed_data(path_to_data:str):
     df = load_from_file(path_to_data)
-    corpus, texts = [], []
+    corpus = []
     for elem in df.text.dropna():
         splitted = elem.split('\n')
         corpus += splitted

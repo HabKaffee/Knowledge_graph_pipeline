@@ -1,6 +1,6 @@
 import os
 import spacy
-from spacy.symbols import *
+from spacy.symbols import nsubj, nsubjpass, dobj, iobj, pobj, obj, obl, nmod, conj, xcomp
 import textacy
 from tqdm import tqdm
 
@@ -9,10 +9,11 @@ from src.preprocessing import load_preprocessed_data
 VERB_PATTERNS = [
         [{"POS":"VERB", "DEP":"ROOT"}],
         [{"POS":"VERB"}, {"POS":"VERB"}],
-        [{"POS":"AUX"}, {"POS":"VERB"}]
+        [{"POS":"AUX"}, {"POS":"VERB"}],
+        [{"POS":"NOUN", "DEP":"ROOT"}]
     ]
 
-NP_LABELS = set([nsubj, nsubjpass, dobj, iobj, pobj, obj, obl])
+NP_LABELS = set([nsubj, nsubjpass, dobj, iobj, pobj, obj, obl, nmod, conj, xcomp])
 
 def pos_tagging():
     activated = spacy.require_gpu()
@@ -23,24 +24,22 @@ def pos_tagging():
         print("GPU is used")
     lang_model = spacy.load('ru_core_news_lg')
     preprocessed_corpus, preprocessed_corpus_sentences = load_preprocessed_data(f'{os.getcwd()}/data/result.json')
-    corpus_after_lm = [lang_model(doc) for doc in preprocessed_corpus_sentences[0:5]]
+    corpus_after_lm = [lang_model(doc) for doc in tqdm(preprocessed_corpus_sentences, desc="Processing by language model")]
     pos = {doc : [] for doc in corpus_after_lm}
-    with tqdm(corpus_after_lm) as progress_bar:
+    with tqdm(corpus_after_lm, desc="Filling dictionary") as progress_bar:
         for text in corpus_after_lm:
             for token in text:
                 pos[text].append([token, token.lemma_, token.pos_, token.dep_])
             progress_bar.update()
             progress_bar.refresh()
         progress_bar.close()
-    # for key, value in pos.items():
-    #     print(key, value)
     return pos
 
 
 def find_root_of_sentence(sentence):
     root_token = None
     for token in sentence:
-        if (token.dep_ == "ROOT"):
+        if token.dep_ == "ROOT":
             root_token = token
     return root_token
 
@@ -48,7 +47,7 @@ def find_root_of_sentence(sentence):
 def contains_root(verb_phrase, root):
     vp_start = verb_phrase.start
     vp_end = verb_phrase.end
-    return vp_start <= root.i <= vp_end if root != None else False
+    return vp_start <= root.i <= vp_end if root is not None else False
 
 
 def get_verb_phrases(sentence):
@@ -78,7 +77,6 @@ def get_longest_verb_phrase(verb_phrases):
 def find_start_pos(sentense, noun_phrase):
     splitted_phrase = noun_phrase.split()
     splitted_sentence = sentense.text.split()
-    print(f'\nsplitted_phrase = {splitted_phrase}\nsplitted_sentence = {splitted_sentence}')
     return splitted_sentence.index(splitted_phrase[0])
 
 
@@ -99,3 +97,15 @@ def extract_triplets(sentence):
     left_noun_phrase = find_noun_phrase(sentence, verb_phrase, noun_phrases, "left")
     right_noun_phrase = find_noun_phrase(sentence, verb_phrase, noun_phrases, "right")
     return (left_noun_phrase, verb_phrase, right_noun_phrase)
+
+
+def dump_triples_to_file(path:str, extracted_triples:dict):
+    with open(path, 'w', encoding="utf-8") as file:
+        file.write("Sentence : (Subject, relation, object)\n")
+        with tqdm(extracted_triples, desc=f'Writing data to {path}') as progress_bar:
+            for key in extracted_triples.keys():
+                # print(f"{key.text} : ({extracted_triples.get(key)[0], extracted_triples.get(key)[1], extracted_triples.get(key)[2]})\n")
+                file.write(f"{key.text} : ({extracted_triples.get(key)[0], extracted_triples.get(key)[1], extracted_triples.get(key)[2]})\n")
+                progress_bar.update()
+                progress_bar.refresh()
+            progress_bar.close()
