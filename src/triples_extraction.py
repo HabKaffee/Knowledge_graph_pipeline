@@ -10,7 +10,9 @@ VERB_PATTERNS = [
         [{"POS":"VERB", "DEP":"ROOT"}],
         [{"POS":"VERB"}, {"POS":"VERB"}],
         [{"POS":"AUX"}, {"POS":"VERB"}],
-        [{"POS":"NOUN", "DEP":"ROOT"}]
+        [{"POS":"NOUN", "DEP":"ROOT"}],
+        [{"POS":"ADJ", "DEP":"ROOT"}],
+        [{"POS":"ADJ", "DEP":"ROOT"}, {"POS":"VERB"}]
     ]
 
 NP_LABELS = set([nsubj, nsubjpass, dobj, iobj, pobj, obj, obl, nmod, conj, xcomp])

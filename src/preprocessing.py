@@ -15,7 +15,7 @@ def load_from_file(path_to_data:str):
 
 
 def preprocess_data(corpus):
-    progress_bar = tqdm.tqdm(range(15), desc="Preprocess data")
+    progress_bar = tqdm.tqdm(range(19), desc="Preprocess data")
     
     ad_at_end = r'Подписывайтесь на наши страницы в соцсетях: .*.'
     exclude_symbols = ''.join(['№', '«', 'ђ', '°', '±', '‚', 'ћ', '‰', '…', '»', 'ѓ', 'µ', '·', 'ґ', 'њ', 'ї', 'џ', 'є', '‹',
@@ -73,6 +73,23 @@ def preprocess_data(corpus):
     corpus = [re.sub('Co . ','Co. ', doc) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
+    
+    corpus = [re.sub('Corp . ','Corp. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
+    corpus = [re.sub('T . C . ', 'T. C. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
+    corpus = [re.sub('Inc . ', 'Inc. ', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+    
+    corpus = [re.sub('прим . ред .', 'примечание редакции', doc) for doc in corpus]
+    progress_bar.update(1)
+    progress_bar.refresh()
+
 
     corpus = [regex_symb.sub(' ', doc) for doc in corpus]
     progress_bar.update(1)
@@ -98,7 +115,10 @@ def preprocess_data(corpus):
     sentenses_in_corpus = [re.sub('Ltd. ','Ltd . ', sentence) for sentence in sentenses_in_corpus]
     sentenses_in_corpus = [re.sub('LLC. ','LLC . ', sentence) for sentence in sentenses_in_corpus]
     sentenses_in_corpus = [re.sub('Co. ','Co . ', sentence) for sentence in sentenses_in_corpus]
-        
+    sentenses_in_corpus = [re.sub('Corp. ','Corp . ', sentence) for sentence in sentenses_in_corpus]
+    sentenses_in_corpus = [re.sub('T. C. ', 'T . C . ', sentence) for sentence in sentenses_in_corpus]
+    sentenses_in_corpus = [re.sub('Inc. ', 'Inc . ', sentence) for sentence in sentenses_in_corpus]
+
     return corpus, sentenses_in_corpus
 
 
