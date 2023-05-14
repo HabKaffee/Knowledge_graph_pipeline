@@ -92,7 +92,7 @@ def find_noun_phrase(sentence, verb_phrase, noun_phrases, side):
             return noun_phrase
 
 
-def extract_triplets(sentence):
+def extract_triples(sentence):
     verb_phrases = get_verb_phrases(sentence)
     noun_phrases = get_noun_chunks(sentence)
     if len(verb_phrases) == 0:
@@ -103,13 +103,24 @@ def extract_triplets(sentence):
     return (left_noun_phrase, verb_phrase, right_noun_phrase)
 
 
-def dump_triples_to_file(path:str, extracted_triples:dict):
+def clean_triples(extracted_triples):
+    cleaned_triples = {}
+    with tqdm(extracted_triples, desc="Clean triples") as progress_bar:
+        for triple in extracted_triples:
+            if all(extracted_triples.get(triple)):
+                cleaned_triples[triple] = extracted_triples.get(triple)
+            progress_bar.update()
+            progress_bar.refresh()
+        progress_bar.close()
+    return cleaned_triples
+
+
+def dump_triples_to_file(path:str, triples:dict):
     with open(path, 'w', encoding="utf-8") as file:
         file.write("Sentence : (Subject, relation, object)\n")
-        with tqdm(extracted_triples, desc=f'Writing data to {path}') as progress_bar:
-            for key in extracted_triples.keys():
-                # print(f"{key.text} : ({extracted_triples.get(key)[0], extracted_triples.get(key)[1], extracted_triples.get(key)[2]})\n")
-                file.write(f"{key.text} : ({extracted_triples.get(key)[0], extracted_triples.get(key)[1], extracted_triples.get(key)[2]})\n")
+        with tqdm(triples, desc=f'Writing data to {path}') as progress_bar:
+            for key in triples.keys():
+                file.write(f"{key.text} : ({triples.get(key)[0], triples.get(key)[1], triples.get(key)[2]})\n")
                 progress_bar.update()
                 progress_bar.refresh()
             progress_bar.close()
