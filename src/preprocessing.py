@@ -63,13 +63,13 @@ def preprocess_data(corpus):
         corpus = [doc.replace(abbriviation, common_abbreviations.get(abbriviation)) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
-    
-    corpus = [re.sub(r' +', ' ', doc) for doc in corpus]
+
+    spaces_punct = {ord(el) : f" {el} " for el in string.punctuation}
+    corpus = [doc.translate(spaces_punct) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
     
-    spaces_punct = {ord(el) : f" {el} " for el in string.punctuation}
-    corpus = [doc.translate(spaces_punct) for doc in corpus]
+    corpus = [re.sub(r' +', ' ', doc) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
     
@@ -77,7 +77,7 @@ def preprocess_data(corpus):
     progress_bar.update(1)
     progress_bar.refresh()
 
-    corpus = [re.sub(r'([\u0410-\u042F]) \. ([\u0410-\u042F]) \. ([\u0410-\u044F]+)', r'\1. \2. \3', doc) for doc in corpus]
+    corpus = [re.sub(r'([А-Я]) \. ([А-Я]) \. ([А-я]+)', r'\1. \2. \3', doc) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
 
@@ -89,7 +89,7 @@ def preprocess_data(corpus):
     progress_bar.update(1)
     progress_bar.refresh()
     
-    corpus = [re.sub(' +', ' ', doc.strip()) for doc in corpus]
+    corpus = [re.sub(r' +', ' ', doc.strip()) for doc in corpus]
     progress_bar.update(1)
     progress_bar.refresh()
     progress_bar.close()
@@ -103,7 +103,7 @@ def preprocess_data(corpus):
         progress_bar_split.close()
     
     sentenses_in_corpus = [re.sub(r'([a-zA-Z]+)\.', r'\1 .', sentence) for sentence in sentenses_in_corpus]
-    sentenses_in_corpus = [re.sub(r'([\u0410-\u042F])\. ([\u0410-\u042F])\. ([\u0410-\u044F]+)', r'\1 . \2 . \3', sentence) for sentence in sentenses_in_corpus]
+    sentenses_in_corpus = [re.sub(r'([А-Я])\. ([А-Я])\. ([А-я]+)', r'\1 . \2 . \3', sentence) for sentence in sentenses_in_corpus]
     return corpus, sentenses_in_corpus
 
 
