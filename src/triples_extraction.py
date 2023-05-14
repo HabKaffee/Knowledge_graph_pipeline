@@ -114,13 +114,3 @@ def clean_triples(extracted_triples):
         progress_bar.close()
     return cleaned_triples
 
-
-def dump_triples_to_file(path:str, triples:dict):
-    with open(path, 'w', encoding="utf-8") as file:
-        file.write("Sentence : (Subject, relation, object)\n")
-        with tqdm(triples, desc=f'Writing data to {path}') as progress_bar:
-            for key in triples.keys():
-                file.write(f"{key.text} : ({triples.get(key)[0], triples.get(key)[1], triples.get(key)[2]})\n")
-                progress_bar.update()
-                progress_bar.refresh()
-            progress_bar.close()
