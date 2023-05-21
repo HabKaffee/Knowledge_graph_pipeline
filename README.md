@@ -19,3 +19,7 @@ Cuda compatible graphic adapter is required for now due to significant speedup i
 
 ## [utils](utils)
 - [adblock_for_chrome](utils/Crystal-Ad-block.crx)
+
+## [visualisation](visualisation)
+- [Graph_for_5k_sentences](visualisation/KG_5000_sentences.html)
+- [Graph_for_10k_sentences](visualisation/KG.html)
