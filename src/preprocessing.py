@@ -21,7 +21,7 @@ def load_from_file(path_to_data:str):
     df = pd.DataFrame()
     with open(path_to_data, 'r', encoding='utf-8') as f:
         file = json.load(f)
-        df = pd.DataFrame(file.get('catalog'))
+        df = pd.DataFrame(file)
     return df
 
 

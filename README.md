@@ -15,3 +15,7 @@ Cuda compatible graphic adapter is required for now due to significant speedup i
 - [preprocessing.py](src/preprocessing.py)
 - [visualisation.py](src/visualisation.py)
 - [utilities.py](src/utilities.py)
+- [crawler.py](src/crawler.py)
+
+## [utils](utils)
+- [adblock_for_chrome](utils/Crystal-Ad-block.crx)
