@@ -27,7 +27,7 @@ def pos_tagging():
     else:
         print("GPU is used")
     lang_model = spacy.load('ru_core_news_lg')
-    preprocessed_corpus, preprocessed_corpus_sentences = load_preprocessed_data(f'{os.getcwd()}/data/result.json')
+    preprocessed_corpus, preprocessed_corpus_sentences = load_preprocessed_data(f'{os.getcwd()}/data/news.json')
     corpus_after_lm = [lang_model(doc) for doc in tqdm(preprocessed_corpus_sentences, desc="Processing by language model")]
     pos = {doc : [] for doc in corpus_after_lm}
     with tqdm(corpus_after_lm, desc="Filling dictionary") as progress_bar:
